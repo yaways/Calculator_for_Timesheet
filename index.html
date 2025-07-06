@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人天费用评估工具</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+
+    <h1>人天费用评估工具</h1>
+
+    <div class="controls">
+        <label for="projectYear">项目年份:</label>
+        <input type="number" id="projectYear" value="2025">
+
+        <label for="startMonth">项目启动月份:</label>
+        <select id="startMonth">
+            <option value="1">1月</option>
+            <option value="2">2月</option>
+            <option value="3">3月</option>
+            <option value="4" selected>4月</option>
+            <option value="5">5月</option>
+            <option value="6">6月</option>
+            <option value="7">7月</option>
+            <option value="8">8月</option>
+            <option value="9">9月</option>
+            <option value="10">10月</option>
+            <option value="11">11月</option>
+            <option value="12">12月</option>
+        </select>
+
+        <label for="projectDuration">项目周期 (月):</label>
+        <input type="number" id="projectDuration" value="6" min="1">
+
+        <button id="generateTableBtn">生成/更新表格</button>
+        <button id="addRowBtn">添加资源行</button>
+        <button id="exportBtn">导出为 Excel</button>
+    </div>
+    <div class="date-picker-controls">
+        <div class="date-picker-group">
+                <label for="holidays-picker">法定节假日:</label>
+                <span class="flatpickr-input-wrapper"><input type="text" id="holidays-picker" placeholder="点击选择节假日"></span>
+            </div>
+            <div class="date-picker-group">
+                <label for="workdays-picker">调休工作日:</label>
+                <span class="flatpickr-input-wrapper"><input type="text" id="workdays-picker" placeholder="点击选择调休工作日"></span>
+            </div>
+    </div>
+
+    <div id="tableContainer">
+        </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</body>
+</html>
