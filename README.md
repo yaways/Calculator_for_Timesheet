@@ -1,2 +1,2 @@
 # Calculator_for_Timesheet
-一个自动计算项目人员投入和费用的简易工具，可导出为excle表格。
+一个自动计算项目人员投入和费用的小工具，可导出为EXCLE表格。
