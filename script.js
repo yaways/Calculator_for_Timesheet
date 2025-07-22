@@ -594,7 +594,9 @@ ${weekInfo.workingDays}天`);
                 notification = document.createElement('div');
                 notification.id = 'regenerate-notification';
                 notification.className = 'notification';
-                notification.innerHTML = '日期已更新，请点击 <strong>生成/更新表格</strong> 按钮重新计算工作日！';
+                
+                // 直接设置通知内容
+                notification.innerHTML = '<span class="notification-message">日期已更新，请点击 <strong>生成/更新表格</strong> 按钮重新计算工作日！</span>';
 
                 // 添加关闭按钮
                 const closeBtn = document.createElement('span');
@@ -625,14 +627,15 @@ ${weekInfo.workingDays}天`);
 
     // 添加一个函数来显示调整资源的提示
     function showAdjustResourceNotification() {
-        console.log('showAdjustResourceNotification called');
         // 创建或获取通知元素
         let notification = document.getElementById('adjust-resource-notification');
         if (!notification) {
             notification = document.createElement('div');
             notification.id = 'adjust-resource-notification';
             notification.className = 'notification';
-            notification.innerHTML = '已添加新的资源行，请根据实际需求调整 <strong>顾问资源类型</strong> 和 <strong>单价</strong>！';
+            
+            // 直接设置通知内容
+            notification.innerHTML = '<span class="notification-message">已添加新的资源行，请根据实际需求调整 <strong>顾问资源类型</strong> 和 <strong>单价</strong>！</span>';
             
             // 添加关闭按钮
             const closeBtn = document.createElement('span');
