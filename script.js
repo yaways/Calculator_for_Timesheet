@@ -7,7 +7,7 @@ let allWeeksDataGlobal = []; // Store week data globally
 let currentTableResources = []; // Global variable to store current table resources
 
 // --- Date Picker Management ---
-    // Removed setupDatePicker function
+// Removed setupDatePicker function
 
 document.addEventListener('DOMContentLoaded', () => {
     const projectYearInput = document.getElementById('projectYear');
@@ -48,15 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const month = String(curDate.getMonth() + 1).padStart(2, '0');
             const day = String(curDate.getDate()).padStart(2, '0');
             const dateString = `${year}-${month}-${day}`;
-            
+
             const dayOfWeek = curDate.getDay();
 
             if (workdays.has(dateString)) {
                 count++;
-            } 
+            }
             else if (holidays.has(dateString)) {
                 // Holiday, do nothing
-            } 
+            }
             else if (dayOfWeek !== 0 && dayOfWeek !== 6) {
                 count++;
             }
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (effectiveStart <= effectiveEnd) {
                 const workingDays = getWorkingDays(effectiveStart, effectiveEnd, holidays, workdays);
-                
+
                 // Always add week data, even if workingDays is 0
                 allWeeksData.push({
                     week: allWeeksData.length + 1, // Use array length for sequential week numbering
@@ -222,7 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addResourceRow() {
         const tableBody = tableContainer.querySelector('tbody');
-        if (!tableBody) return;
+        if (!tableBody) {
+            alert('请先生成表格！');
+            return;
+        }
         const existingRows = tableBody.querySelectorAll('tr').length;
         const newRowIndex = currentTableResources.length; // New index for the added row
         const totalWeeks = allWeeksDataGlobal.length; // Use global totalWeeks
@@ -244,13 +247,17 @@ document.addEventListener('DOMContentLoaded', () => {
         setupRowEventListeners(tableBody.querySelector(`tr[data-row-index="${newRowIndex}"]`));
         updateTotals();
         saveTableData();
+        
+        // 显示调整资源的提示
+        console.log('Calling showAdjustResourceNotification');
+        showAdjustResourceNotification();
     }
 
     function updateTotals() {
         let grandTotalManDay = 0;
         let grandTotalPrice = 0;
         const resourceRows = tableContainer.querySelectorAll('tbody tr:not(:last-child)');
-        
+
         // Initialize weekly totals array
         const firstResourceRow = resourceRows[0];
         const numberOfWeeks = firstResourceRow ? firstResourceRow.querySelectorAll('.man-day-input').length : 0;
@@ -365,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             (tableData.holidays || []).forEach(date => holidaysSet.add(date));
             workdaysSet.clear(); // Clear existing set
             (tableData.workdays || []).forEach(date => workdaysSet.add(date));
-            
+
             // Load resources
             currentTableResources = tableData.resources || [];
 
@@ -377,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // The user must click the button to generate the table.
 
         } else {
-             // Set default year/month if no saved data, but do not generate the table.
+            // Set default year/month if no saved data, but do not generate the table.
             const currentDate = new Date();
             projectYearInput.value = currentDate.getFullYear();
             startMonthInput.value = currentDate.getMonth() + 1;
@@ -404,10 +411,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const worksheet = workbook.addWorksheet('人天费用评估');
 
         // --- 1. Define Reusable Styles ---
-        const thinBorder = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+        const thinBorder = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         const headerStyle = {
             font: { bold: true, color: { argb: 'FF000000' } }, // Black font for light background
-            fill: { type: 'pattern', pattern:'solid', fgColor:{ argb:'FFE2F0D5' } }, // Light Green
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2F0D5' } }, // Light Green
             alignment: { horizontal: 'center', vertical: 'middle', wrapText: true },
             border: thinBorder
         };
@@ -501,7 +508,7 @@ ${weekInfo.workingDays}天`);
                 } else {
                     currentCell.style = cellStyle;
                 }
-                
+
                 // Center-align numbers
                 if (typeof currentCell.value === 'number') {
                     currentCell.alignment = { ...currentCell.alignment, horizontal: 'center' };
@@ -566,26 +573,100 @@ ${weekInfo.workingDays}天`);
         span.style.font = getComputedStyle(inputElement).font; // Match font styles
         span.textContent = text;
         document.body.appendChild(span);
-        
+
         // Calculate width including padding and border
         const padding = parseFloat(getComputedStyle(inputElement).paddingLeft) + parseFloat(getComputedStyle(inputElement).paddingRight);
         const border = parseFloat(getComputedStyle(inputElement).borderLeftWidth) + parseFloat(getComputedStyle(inputElement).borderRightWidth);
         const newWidth = span.offsetWidth + padding + border + 2; // Add a small buffer
-        
+
         inputElement.style.width = `${newWidth}px`;
         document.body.removeChild(span);
+    }
+
+    // 添加一个函数来显示重新生成表格的提示
+    function showRegenerateTableNotification() {
+        // 检查表格是否已经存在
+        const tableExists = tableContainer.querySelector('table');
+        if (tableExists) {
+            // 创建或获取通知元素
+            let notification = document.getElementById('regenerate-notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'regenerate-notification';
+                notification.className = 'notification';
+                notification.innerHTML = '日期已更新，请点击 <strong>生成/更新表格</strong> 按钮重新计算工作日！';
+
+                // 添加关闭按钮
+                const closeBtn = document.createElement('span');
+                closeBtn.className = 'close-notification';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.onclick = function () {
+                    notification.style.display = 'none';
+                };
+                notification.appendChild(closeBtn);
+
+                // 插入到表格容器前面
+                tableContainer.parentNode.insertBefore(notification, tableContainer);
+            } else {
+                // 如果通知已存在，确保它是可见的
+                notification.style.display = 'block';
+            }
+
+            // 高亮生成表格按钮
+            generateTableBtn.classList.add('highlight-button');
+
+            // 5秒后自动隐藏通知
+            setTimeout(() => {
+                if (notification) notification.style.display = 'none';
+                generateTableBtn.classList.remove('highlight-button');
+            }, 5000);
+        }
+    }
+
+    // 添加一个函数来显示调整资源的提示
+    function showAdjustResourceNotification() {
+        console.log('showAdjustResourceNotification called');
+        // 创建或获取通知元素
+        let notification = document.getElementById('adjust-resource-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'adjust-resource-notification';
+            notification.className = 'notification';
+            notification.innerHTML = '已添加新的资源行，请根据实际需求调整 <strong>顾问资源类型</strong> 和 <strong>单价</strong>！';
+            
+            // 添加关闭按钮
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'close-notification';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = function() {
+                notification.style.display = 'none';
+            };
+            notification.appendChild(closeBtn);
+            
+            // 插入到表格容器前面
+            tableContainer.parentNode.insertBefore(notification, tableContainer);
+        } else {
+            // 如果通知已存在，确保它是可见的
+            notification.style.display = 'block';
+        }
+        
+        // 4秒后自动隐藏通知
+        setTimeout(() => {
+            if (notification) notification.style.display = 'none';
+        }, 4000);
     }
 
     // Initialize Flatpickr for holidays
     flatpickr(holidaysPicker, {
         mode: "multiple",
         dateFormat: "Y-m-d",
-        onChange: function(selectedDates, dateStr, instance) {
+        onChange: function (selectedDates, dateStr, instance) {
             holidaysSet.clear();
             selectedDates.forEach(date => holidaysSet.add(flatpickr.formatDate(date, "Y-m-d")));
             updateDateList(holidaysSet, holidaysList);
             saveTableData();
             adjustInputWidth(holidaysPicker, dateStr); // Adjust width dynamically
+            showRegenerateTableNotification(); // 显示重新生成表格的提示
         }
     });
 
@@ -593,22 +674,32 @@ ${weekInfo.workingDays}天`);
     flatpickr(workdaysPicker, {
         mode: "multiple",
         dateFormat: "Y-m-d",
-        onChange: function(selectedDates, dateStr, instance) {
+        onChange: function (selectedDates, dateStr, instance) {
             workdaysSet.clear();
             selectedDates.forEach(date => workdaysSet.add(flatpickr.formatDate(date, "Y-m-d")));
             updateDateList(workdaysSet, workdaysList);
             saveTableData();
             adjustInputWidth(workdaysPicker, dateStr); // Adjust width dynamically
+            showRegenerateTableNotification(); // 显示重新生成表格的提示
         }
     });
 
     generateTableBtn.addEventListener('click', () => {
         generateTable();
         saveTableData();
+
+        // 隐藏通知
+        const notification = document.getElementById('regenerate-notification');
+        if (notification) {
+            notification.style.display = 'none';
+        }
+
+        // 移除按钮高亮
+        generateTableBtn.classList.remove('highlight-button');
     });
     addRowBtn.addEventListener('click', addResourceRow);
     exportBtn.addEventListener('click', exportToExcel);
-    
+
     // Auto-save on main control changes
     [projectYearInput, startMonthInput, projectDurationInput].forEach(input => {
         input.addEventListener('change', saveTableData);
